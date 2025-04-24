@@ -1,0 +1,47 @@
+using ClimaNotificacoesAPI.Domain.Entities;
+using ClimaNotificacoesAPI.Domain.Interfaces;
+using ClimaNotificacoesAPI.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
+
+namespace ClimaNotificacoesAPI.Infrastructure.Repositories;
+
+public class CidadeRepository : ICidadeRepository
+{
+    private readonly ClimaNotificacoesDBContext _context;
+    public CidadeRepository(ClimaNotificacoesDBContext context)
+    {
+        _context = context;
+    }
+
+    public async Task<IEnumerable<Cidade>> GetAllAsync()
+    {
+        return await _context.Cidades.ToListAsync();
+    }
+
+    public async Task<Cidade> GetByIdAsync(int id)
+    {
+        return await _context.Cidades.FindAsync(id);
+    }
+
+    public async Task<Cidade> AddAsync(Cidade cidade)
+    {
+        await _context.Cidades.AddAsync(cidade);
+        await _context.SaveChangesAsync();
+        return cidade;
+    }
+    public async Task<Cidade> UpdateAsync(Cidade cidade)
+    {
+        _context.Cidades.Update(cidade);
+        await _context.SaveChangesAsync();
+        return cidade;
+    }
+    public async Task DeleteAsync(int id)
+    {
+        var cidade = await GetByIdAsync(id);
+        if (cidade != null)
+        {
+            _context.Cidades.Remove(cidade);
+            await _context.SaveChangesAsync();
+        }
+    }
+}
