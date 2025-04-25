@@ -1,14 +1,17 @@
 using ClimaNotificacoesAPI.Domain.Entities;
 using ClimaNotificacoesAPI.Domain.Interfaces;
+using Microsoft.AspNetCore.Identity;
 
-namespace ClimaNotificacoesAPI.Domain.Services;
+namespace ClimaNotificacoesAPI.Application.Services;
 
-public class UsuarioService 
+public class UsuarioService
 {
     private readonly IUsuarioRepository _usuarioRepository;
-    public UsuarioService(IUsuarioRepository usuarioRepository)
+    private readonly PasswordHasher<Usuario> _passwordHasher = new PasswordHasher<Usuario>();
+    public UsuarioService(IUsuarioRepository usuarioRepository, PasswordHasher<Usuario> passwordHasher)
     {
         _usuarioRepository = usuarioRepository;
+        _passwordHasher = passwordHasher;
     }
     public async Task<Usuario> GetByIdAsync(int id)
     {
@@ -20,14 +23,21 @@ public class UsuarioService
     }
     public async Task<Usuario> CreateAsync(Usuario usuario)
     {
+
+        usuario.Senha = _passwordHasher.HashPassword(usuario, usuario.Senha);
         return await _usuarioRepository.AddAsync(usuario);
     }
     public async Task<Usuario> UpdateAsync(Usuario usuario)
     {
+        usuario.Senha = _passwordHasher.HashPassword(usuario, usuario.Senha);
         return await _usuarioRepository.UpdateAsync(usuario);
     }
     public async Task DeleteAsync(int id)
     {
         await _usuarioRepository.DeleteAsync(id);
+    }
+    public async Task<Usuario> GetByEmailAsync(string email)
+    {
+        return await _usuarioRepository.GetByEmailAsync(email);
     }
 }

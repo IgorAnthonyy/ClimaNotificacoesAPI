@@ -1,7 +1,7 @@
 using ClimaNotificacoesAPI.Domain.Entities;
 using ClimaNotificacoesAPI.Domain.Interfaces;
 
-namespace ClimaNotificacoesAPI.Domain.Services;
+namespace ClimaNotificacoesAPI.Application.Services;
 
 public class PrevisaoTempoService
 {
