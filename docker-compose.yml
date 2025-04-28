@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=SuaSenhaForte@#$23
+    ports:
+      - "1433:1433"
+    networks:
+      - clima-net
+
+  clima-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: clima-api
+    ports:
+      - "8080:80"
+    depends_on:
+      - sqlserver
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=ClimaNotificacoesDB;User=sa;Password=SuaSenhaForte@#$23;TrustServerCertificate=True
+    networks:
+      - clima-net
+
+networks:
+  clima-net:
+    driver: bridge

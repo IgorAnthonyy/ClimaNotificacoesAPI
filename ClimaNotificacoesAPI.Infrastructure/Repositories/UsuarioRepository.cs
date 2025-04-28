@@ -46,4 +46,9 @@ public class UsuarioRepository : IUsuarioRepository
     {
         return await _context.Usuarios.FirstOrDefaultAsync(u => u.Email == email);
     }
+    public async Task<IEnumerable<Cidade>> GetCidadesByUsuarioIdAsync(int usuarioId)
+    {
+        return await _context.Cidades.Where(c => c.UsuarioId == usuarioId)
+        .ToListAsync();
+    }
 }

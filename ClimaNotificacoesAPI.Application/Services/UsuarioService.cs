@@ -8,10 +8,9 @@ public class UsuarioService
 {
     private readonly IUsuarioRepository _usuarioRepository;
     private readonly PasswordHasher<Usuario> _passwordHasher = new PasswordHasher<Usuario>();
-    public UsuarioService(IUsuarioRepository usuarioRepository, PasswordHasher<Usuario> passwordHasher)
+    public UsuarioService(IUsuarioRepository usuarioRepository)
     {
         _usuarioRepository = usuarioRepository;
-        _passwordHasher = passwordHasher;
     }
     public async Task<Usuario> GetByIdAsync(int id)
     {
@@ -39,5 +38,9 @@ public class UsuarioService
     public async Task<Usuario> GetByEmailAsync(string email)
     {
         return await _usuarioRepository.GetByEmailAsync(email);
+    }
+    public async Task<IEnumerable<Cidade>> GetCidadesByUsuarioIdAsync(int usuarioId)
+    {
+        return await _usuarioRepository.GetCidadesByUsuarioIdAsync(usuarioId);
     }
 }

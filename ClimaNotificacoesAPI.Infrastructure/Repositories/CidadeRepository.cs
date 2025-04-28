@@ -20,7 +20,9 @@ public class CidadeRepository : ICidadeRepository
 
     public async Task<Cidade> GetByIdAsync(int id)
     {
-        return await _context.Cidades.FindAsync(id);
+        return await _context.Cidades
+         .Include(c => c.Usuario)
+         .FirstOrDefaultAsync(c => c.Id == id);
     }
 
     public async Task<Cidade> AddAsync(Cidade cidade)
@@ -44,4 +46,5 @@ public class CidadeRepository : ICidadeRepository
             await _context.SaveChangesAsync();
         }
     }
+  
 }

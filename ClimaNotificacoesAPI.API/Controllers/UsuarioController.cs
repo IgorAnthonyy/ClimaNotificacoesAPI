@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ClimaNotificacoesAPI.API.Controllers;
 [ApiController]
-[Route("api/[controller]")]
+[Route("[controller]")]
 public class UsuarioController : ControllerBase
 {
     private readonly UsuarioService _usuarioService;
@@ -15,6 +15,7 @@ public class UsuarioController : ControllerBase
     {
         _usuarioService = usuarioService;
     }
+
     [HttpGet("{id}")]
     public async Task<IActionResult> GetUsuario(int id)
     {
@@ -23,14 +24,17 @@ public class UsuarioController : ControllerBase
         {
             return NotFound();
         }
-        return Ok(usuario);
+        var usuarioResponse = usuario.Adapt<UsuarioDTOResponse>();
+        return Ok(usuarioResponse);
     }
+    [HttpGet]
     public async Task<IActionResult> GetUsuarios()
     {
         var usuarios = await _usuarioService.GetAllAsync();
         var usuariosResponse = usuarios.Adapt<List<UsuarioDTOResponse>>();
         return Ok(usuariosResponse);
     }
+
     [HttpPost]
     public async Task<IActionResult> CreateUsuario([FromBody] UsuarioDTORequest usuarioDto)
     {
@@ -44,6 +48,7 @@ public class UsuarioController : ControllerBase
         var usuarioResponse = usuarioCriado.Adapt<UsuarioDTOResponse>();
         return CreatedAtAction(nameof(GetUsuario), new { id = usuarioResponse.Id }, usuarioResponse);
     }
+
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateUsuario(int id, [FromBody] UsuarioDTORequest usuarioDto)
     {
@@ -62,6 +67,7 @@ public class UsuarioController : ControllerBase
         var usuarioResponse = usuarioAtualizado.Adapt<UsuarioDTOResponse>();
         return Ok(usuarioResponse);
     }
+
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteUsuario(int id)
     {
@@ -73,6 +79,16 @@ public class UsuarioController : ControllerBase
         await _usuarioService.DeleteAsync(id);
         return NoContent();
     }
-    
+    [HttpGet("{id}/cidades")]
+    public async Task<IActionResult> GetCidadesByUsuarioId(int id)
+    {
+        var cidades = await _usuarioService.GetCidadesByUsuarioIdAsync(id);
+        if (cidades == null || !cidades.Any())
+        {
+            return NotFound("Nenhuma cidade encontrada para o usuário.");
+        }
+        var cidadesResponse = cidades.Adapt<List<CidadePorUsuarioDTO>>();
+        return Ok(cidadesResponse);
+    }
 }
 

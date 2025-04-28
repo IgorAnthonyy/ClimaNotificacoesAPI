@@ -9,4 +9,6 @@ public interface IUsuarioRepository
     Task<Usuario> UpdateAsync(Usuario usuario);
     Task DeleteAsync(int id);
     Task<Usuario> GetByEmailAsync(string email);
+
+    Task<IEnumerable<Cidade>> GetCidadesByUsuarioIdAsync(int usuarioId);
 }
