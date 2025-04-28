@@ -22,4 +22,12 @@ public class CidadeService
     {
         await _cidadeRepository.DeleteAsync(id);
     }
+    public async Task<List<PrevisaoTempo>> GetPrevisaoTempoByCidadeAsync(int cidadeId)
+    {
+        return await _cidadeRepository.GetPrevisaoTempoByCidadeAsync(cidadeId);
+    }
+    public async Task<List<Cidade>> GetAllAsync()
+    {
+        return await _cidadeRepository.GetAllAsync();
+    }
 }

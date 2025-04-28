@@ -65,4 +65,26 @@ public class CidadeController : ControllerBase
         await _cidadeService.DeleteAsync(id);
         return NoContent();
     }
+    [HttpGet("{id}/PrevisaoTempo")]
+    public async Task<IActionResult> GetPrevisaoTempo(int id)
+    {
+        var previsaoTempo = await _cidadeService.GetPrevisaoTempoByCidadeAsync(id);
+        if (previsaoTempo == null || !previsaoTempo.Any())
+        {
+            return NotFound();
+        }
+        var previsaoTempoResponse = previsaoTempo.Adapt<List<PrevisaoDTOResponse>>();
+        return Ok(previsaoTempoResponse);
+    }
+    [HttpGet]
+    public async Task<IActionResult> GetCidades()
+    {
+        var cidades = await _cidadeService.GetAllAsync();
+        if (cidades == null || !cidades.Any())
+        {
+            return NotFound();
+        }
+        var cidadesResponse = cidades.Adapt<List<CidadeDTOResponse>>();
+        return Ok(cidadesResponse);
+    }
 }

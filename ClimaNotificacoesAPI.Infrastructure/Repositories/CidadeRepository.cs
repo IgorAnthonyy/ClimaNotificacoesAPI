@@ -35,5 +35,16 @@ public class CidadeRepository : ICidadeRepository
             await _context.SaveChangesAsync();
         }
     }
-  
+    public async Task<List<PrevisaoTempo>> GetPrevisaoTempoByCidadeAsync(int cidadeId)
+    {
+        return await _context.PrevisaoTempos
+            .Where(p => p.CidadeId == cidadeId)
+            .Include(p => p.Cidade)
+            .ToListAsync();
+    }
+    public async Task<List<Cidade>> GetAllAsync()
+    {
+        return await _context.Cidades
+            .ToListAsync();
+    }
 }

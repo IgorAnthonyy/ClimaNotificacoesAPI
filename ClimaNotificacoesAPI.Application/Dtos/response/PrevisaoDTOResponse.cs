@@ -8,6 +8,4 @@ public class PrevisaoDTOResponse
     public double TemperaturaMinima { get; set; }
     public double Umidade { get; set; }
     public double VelocidadeVento { get; set; }
-    public int CidadeId { get; set; }
-    public CidadeDTOResponse Cidade { get; set; } = new CidadeDTOResponse();
 }
