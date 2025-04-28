@@ -21,7 +21,8 @@ builder.Services.AddScoped<ICidadeRepository, CidadeRepository>();
 builder.Services.AddScoped<CidadeService>();
 builder.Services.AddScoped<IPrevisaoTempoRepository, PrevisaoTempoRepository>();
 builder.Services.AddScoped<PrevisaoTempoService>();
-
+builder.Services.AddHttpClient<WeatherService>();
+builder.Services.AddScoped<WeatherService>();
 UsuarioProfile.ConfigureMappings();
 CidadeProfile.ConfigureMappings();
 PrevisaoProfile.ConfigureMappings();
