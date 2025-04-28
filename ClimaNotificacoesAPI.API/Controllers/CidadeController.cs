@@ -54,4 +54,15 @@ public class CidadeController : ControllerBase
         var cidadeResponse = cidadeBuscar.Adapt<CidadeDTOResponse>();
         return CreatedAtAction(nameof(GetCidade), new { id = cidadeResponse.Id }, cidadeResponse);
     }
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteCidade(int id)
+    {
+        var cidade = await _cidadeService.GetByIdAsync(id);
+        if (cidade == null)
+        {
+            return NotFound();
+        }
+        await _cidadeService.DeleteAsync(id);
+        return NoContent();
+    }
 }

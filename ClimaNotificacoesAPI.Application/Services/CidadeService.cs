@@ -3,7 +3,7 @@ using ClimaNotificacoesAPI.Domain.Interfaces;
 
 namespace ClimaNotificacoesAPI.Application.Services;
 
-public class CidadeService 
+public class CidadeService
 {
     private readonly ICidadeRepository _cidadeRepository;
     public CidadeService(ICidadeRepository cidadeRepository)
@@ -14,17 +14,9 @@ public class CidadeService
     {
         return await _cidadeRepository.GetByIdAsync(id);
     }
-    public async Task<IEnumerable<Cidade>> GetAllAsync()
-    {
-        return await _cidadeRepository.GetAllAsync();
-    }
     public async Task<Cidade> CreateAsync(Cidade cidade)
     {
         return await _cidadeRepository.AddAsync(cidade);
-    }
-    public async Task<Cidade> UpdateAsync(Cidade cidade)
-    {
-        return await _cidadeRepository.UpdateAsync(cidade);
     }
     public async Task DeleteAsync(int id)
     {

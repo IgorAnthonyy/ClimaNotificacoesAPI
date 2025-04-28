@@ -13,11 +13,6 @@ public class CidadeRepository : ICidadeRepository
         _context = context;
     }
 
-    public async Task<IEnumerable<Cidade>> GetAllAsync()
-    {
-        return await _context.Cidades.ToListAsync();
-    }
-
     public async Task<Cidade> GetByIdAsync(int id)
     {
         return await _context.Cidades
@@ -28,12 +23,6 @@ public class CidadeRepository : ICidadeRepository
     public async Task<Cidade> AddAsync(Cidade cidade)
     {
         await _context.Cidades.AddAsync(cidade);
-        await _context.SaveChangesAsync();
-        return cidade;
-    }
-    public async Task<Cidade> UpdateAsync(Cidade cidade)
-    {
-        _context.Cidades.Update(cidade);
         await _context.SaveChangesAsync();
         return cidade;
     }
