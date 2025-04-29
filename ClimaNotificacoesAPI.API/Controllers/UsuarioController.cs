@@ -1,4 +1,5 @@
 using ClimaNotificacoesAPI.Application.Dtos;
+using ClimaNotificacoesAPI.Application.Exceptions;
 using ClimaNotificacoesAPI.Application.Services;
 using ClimaNotificacoesAPI.Domain.Entities;
 using Mapster;
@@ -38,59 +39,72 @@ public class UsuarioController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateUsuario([FromBody] UsuarioDTORequest usuarioDto)
     {
-        var usuarioExistente = await _usuarioService.GetByEmailAsync(usuarioDto.Email);
+        try
+        {
+            var usuarioEntity = usuarioDto.Adapt<Usuario>();
+            var usuarioCriado = await _usuarioService.CreateAsync(usuarioEntity);
+            var usuarioResponse = usuarioCriado.Adapt<UsuarioDTOResponse>();
+            return CreatedAtAction(nameof(GetUsuario), new { id = usuarioResponse.Id }, usuarioResponse);
+        }
+        catch (EmailJaCadastradoException ex)
+        {
+            return Conflict(ex.Message);
+        }
 
-        if (usuarioExistente != null)
-            return Conflict($"Já existe outro usuário com o e-mail {usuarioDto.Email}.");
-
-        var usuarioEntitie = usuarioDto.Adapt<Usuario>();
-        var usuarioCriado = await _usuarioService.CreateAsync(usuarioEntitie);
-        var usuarioResponse = usuarioCriado.Adapt<UsuarioDTOResponse>();
-        return CreatedAtAction(nameof(GetUsuario), new { id = usuarioResponse.Id }, usuarioResponse);
     }
 
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateUsuario(int id, [FromBody] UsuarioDTORequest usuarioDto)
     {
-        var usuarioExistente = await _usuarioService.GetByIdAsync(id);
-        if (usuarioExistente == null)
+        try
         {
-            return BadRequest("ID invalido.");
+            var usuarioEntity = usuarioDto.Adapt<Usuario>();
+            usuarioEntity.Id = id;
+            var usuarioAtualizado = await _usuarioService.UpdateAsync(usuarioEntity);
+            var usuarioResponse = usuarioAtualizado.Adapt<UsuarioDTOResponse>();
+            return Ok(usuarioResponse);
         }
-        var usuarioComMesmoEmail = await _usuarioService.GetByEmailAsync(usuarioDto.Email);
-        if (usuarioComMesmoEmail != null && usuarioComMesmoEmail.Id != id)
-            return Conflict($"Já existe outro usuário com o e-mail {usuarioDto.Email}.");
-
-        usuarioExistente.Nome = usuarioDto.Nome;
-        usuarioExistente.Email = usuarioDto.Email;
-        usuarioExistente.Senha = usuarioDto.Senha;
-
-        var usuarioAtualizado = await _usuarioService.UpdateAsync(usuarioExistente);
-        var usuarioResponse = usuarioAtualizado.Adapt<UsuarioDTOResponse>();
-        return Ok(usuarioResponse);
+        catch (EmailJaCadastradoException ex)
+        {
+            return Conflict(ex.Message);
+        }
+        catch (UsuarioNaoEncontradoException ex)
+        {
+            return NotFound(ex.Message);
+        }
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteUsuario(int id)
     {
-        var usuarioExistente = await _usuarioService.GetByIdAsync(id);
-        if (usuarioExistente == null)
+        try
         {
-            return NotFound("ID invalido.");
+            await _usuarioService.DeleteAsync(id);
+            return NoContent();
         }
-        await _usuarioService.DeleteAsync(id);
-        return NoContent();
+        catch (UsuarioNaoEncontradoException ex)
+        {
+            return NotFound(ex.Message);
+        }
     }
     [HttpGet("{id}/cidades")]
     public async Task<IActionResult> GetCidadesByUsuarioId(int id)
     {
-        var cidades = await _usuarioService.GetCidadesByUsuarioIdAsync(id);
-        if (cidades == null || !cidades.Any())
+        try
         {
-            return NotFound("Nenhuma cidade encontrada para o usuário.");
+            var cidades = await _usuarioService.GetCidadesByUsuarioIdAsync(id);
+            var cidadesResponse = cidades.Adapt<List<CidadePorUsuarioDTO>>();
+            return Ok(cidadesResponse);
         }
-        var cidadesResponse = cidades.Adapt<List<CidadePorUsuarioDTO>>();
-        return Ok(cidadesResponse);
+        catch (CidadeNaoEncontradaException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (UsuarioNaoEncontradoException ex)
+        {
+            return NotFound(ex.Message);
+        }
     }
 }
+
 

@@ -1,4 +1,5 @@
 using ClimaNotificacoesAPI.Application.Dtos;
+using ClimaNotificacoesAPI.Application.Exceptions;
 using ClimaNotificacoesAPI.Domain.Entities;
 using ClimaNotificacoesAPI.Domain.Interfaces;
 using Mapster;
@@ -21,8 +22,12 @@ public class PrevisaoTempoService
         _emailService = emailService;
         _previsaoTempoRepository = previsaoTempoRepository;
     }
-    public async Task<PrevisaoDTOResponse> FetchAndUpdateForecastAsync(Cidade cidade)
+    public async Task<PrevisaoDTOResponse> FetchAndUpdateForecastAsync(int cidadeId)
     {
+        var cidade = await _cidadeService.GetByIdAsync(cidadeId);
+        if (cidade == null)
+            throw new CidadeNaoEncontradaException("Cidade");
+
         var previsaoJson = await _weatherService.GetForecast(cidade.Nome);
 
         if (previsaoJson == null)

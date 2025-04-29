@@ -1,4 +1,5 @@
 using ClimaNotificacoesAPI.Application.Dtos;
+using ClimaNotificacoesAPI.Application.Exceptions;
 using ClimaNotificacoesAPI.Application.Services;
 using ClimaNotificacoesAPI.Domain.Entities;
 using Mapster;
@@ -11,79 +12,58 @@ namespace ClimaNotificacoesAPI.API.Controllers;
 public class CidadeController : ControllerBase
 {
     private readonly CidadeService _cidadeService;
-    private readonly UsuarioService _usuarioService;
 
-    public CidadeController(CidadeService cidadeService, UsuarioService usuarioService)
+    public CidadeController(CidadeService cidadeService)
     {
-        _usuarioService = usuarioService;
         _cidadeService = cidadeService;
     }
     [HttpGet("{id}")]
     public async Task<IActionResult> GetCidade(int id)
     {
         var cidade = await _cidadeService.GetByIdAsync(id);
-        if (cidade == null)
-        {
-            return NotFound();
-        }
         var cidadeResponse = cidade.Adapt<CidadeDTOResponse>();
         return Ok(cidadeResponse);
     }
     [HttpPost]
     public async Task<IActionResult> CreateCidade([FromBody] CidadeDTORequest cidadeDto)
     {
-        var cidadesUsuario = await _usuarioService.GetCidadesByUsuarioIdAsync(cidadeDto.UsuarioId);
-        var cidadeExistente = false;
-        if (cidadesUsuario != null)
+        try
         {
-            foreach (var cidade in cidadesUsuario)
-            {
-                if (cidade.Nome == cidadeDto.Nome)
-                {
-                    cidadeExistente = true;
-                    break;
-                }
-            }
+            var cidadeEntitie = cidadeDto.Adapt<Cidade>();
+            var cidadeCriada = await _cidadeService.CreateAsync(cidadeEntitie);
+            var cidadeBuscar = await _cidadeService.GetByIdAsync(cidadeCriada.Id);
+            var cidadeResponse = cidadeBuscar.Adapt<CidadeDTOResponse>();
+            return CreatedAtAction(nameof(GetCidade), new { id = cidadeResponse.Id }, cidadeResponse);
         }
-        if (cidadeExistente)
-            return Conflict($"Já existe outra cidade com o nome {cidadeDto.Nome}.");
-
-        var cidadeEntitie = cidadeDto.Adapt<Cidade>();
-        var cidadeCriada = await _cidadeService.CreateAsync(cidadeEntitie);
-        var cidadeBuscar = await _cidadeService.GetByIdAsync(cidadeCriada.Id);
-        var cidadeResponse = cidadeBuscar.Adapt<CidadeDTOResponse>();
-        return CreatedAtAction(nameof(GetCidade), new { id = cidadeResponse.Id }, cidadeResponse);
+        catch (CidadeJaCadastradaParaEsseUsuarioException ex)
+        {
+            return Conflict(ex.Message);
+        }
     }
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteCidade(int id)
     {
-        var cidade = await _cidadeService.GetByIdAsync(id);
-        if (cidade == null)
-        {
-            return NotFound();
-        }
         await _cidadeService.DeleteAsync(id);
         return NoContent();
     }
     [HttpGet("{id}/PrevisaoTempo")]
     public async Task<IActionResult> GetPrevisaoTempo(int id)
     {
-        var previsaoTempo = await _cidadeService.GetPrevisaoTempoByCidadeAsync(id);
-        if (previsaoTempo == null || !previsaoTempo.Any())
+        try
         {
-            return NotFound();
+            var previsaoTempo = await _cidadeService.GetPrevisaoTempoByCidadeAsync(id);
+            var previsaoTempoResponse = previsaoTempo.Adapt<List<PrevisaoDTOResponse>>();
+            return Ok(previsaoTempoResponse);
         }
-        var previsaoTempoResponse = previsaoTempo.Adapt<List<PrevisaoDTOResponse>>();
-        return Ok(previsaoTempoResponse);
+        catch (CidadeNaoEncontradaException ex)
+        {
+            return NotFound(ex.Message);
+        }
     }
     [HttpGet]
     public async Task<IActionResult> GetCidades()
     {
         var cidades = await _cidadeService.GetAllAsync();
-        if (cidades == null || !cidades.Any())
-        {
-            return NotFound();
-        }
         var cidadesResponse = cidades.Adapt<List<CidadeDTOResponse>>();
         return Ok(cidadesResponse);
     }

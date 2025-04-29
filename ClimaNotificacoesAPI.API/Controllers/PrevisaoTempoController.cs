@@ -9,28 +9,27 @@ namespace ClimaNotificacoesAPI.Controllers;
 [ApiController]
 public class PrevisaoTempoController : ControllerBase
 {
-    private readonly ICidadeRepository _cidadeRepository;
     private readonly PrevisaoTempoService _previsaoTempoService;
 
-    public PrevisaoTempoController(PrevisaoTempoService previsaoTempoService, ICidadeRepository cidadeRepository)
+    public PrevisaoTempoController(PrevisaoTempoService previsaoTempoService)
     {
-        _cidadeRepository = cidadeRepository;
         _previsaoTempoService = previsaoTempoService;
     }
 
     [HttpPost("{id}")]
     public async Task<ActionResult> ObterPrevisao(int id)
     {
-        var cidade = await _cidadeRepository.GetByIdAsync(id);
 
-        if (cidade == null)
+        try
         {
-            return BadRequest("Cidade não encontrada.");
+            var previsaoResponse = await _previsaoTempoService.FetchAndUpdateForecastAsync(id);
+            return Ok(previsaoResponse);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
         }
 
-
-        var previsaoResponse = await _previsaoTempoService.FetchAndUpdateForecastAsync(cidade);
-        return Ok(previsaoResponse);
     }
 
 }
