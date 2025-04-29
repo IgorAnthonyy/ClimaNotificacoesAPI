@@ -10,6 +10,8 @@ using Microsoft.EntityFrameworkCore;  // Importando bibliotecas para trabalhar c
 
 var builder = WebApplication.CreateBuilder(args);  // Criando o builder da aplicação Web
 
+DotNetEnv.Env.Load();
+builder.Configuration.AddEnvironmentVariables();  // Carregando variáveis de ambiente para configuração
 // Adicionando os serviços necessários para o controlador de APIs
 builder.Services.AddControllers();  // Adiciona suporte a controllers (APIs) no pipeline
 builder.Services.AddEndpointsApiExplorer();  // Habilita a descoberta de endpoints na documentação
@@ -25,7 +27,7 @@ builder.Services.AddScoped<PrevisaoTempoService>();  // Registrando o serviço d
 builder.Services.AddHttpClient<WeatherService>();  // Registrando o serviço para consultar o clima
 builder.Services.AddScoped<WeatherService>();  // Registrando a implementação do serviço WeatherService
 builder.Services.AddHostedService<PrevisaoTempoJob>();  // Registrando o serviço em segundo plano para atualização das previsões de tempo
-
+builder.Services.AddScoped<EmailService>();  // Registrando o serviço de envio de e-mails
 // Configurando os mapeamentos de objetos para as entidades (Mapster)
 UsuarioProfile.ConfigureMappings();  // Configura mapeamento de Usuario
 CidadeProfile.ConfigureMappings();  // Configura mapeamento de Cidade

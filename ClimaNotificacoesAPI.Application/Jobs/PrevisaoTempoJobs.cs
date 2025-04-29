@@ -41,7 +41,7 @@ public class PrevisaoTempoJob : BackgroundService
                     try
                     {
                         // Chama o serviço PrevisaoTempoService para buscar e atualizar a previsão de tempo para a cidade
-                        await previsaoTempoService.BuscarEAtualizarPrevisaoAsync(cidade);
+                        await previsaoTempoService.FetchAndUpdateForecastAsync(cidade);
 
                         // Registra no log que a previsão foi atualizada com sucesso para essa cidade
                         _logger.LogInformation($"Previsão atualizada para {cidade.Nome}.");

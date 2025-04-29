@@ -61,9 +61,11 @@ public class UsuarioController : ControllerBase
         if (usuarioComMesmoEmail != null && usuarioComMesmoEmail.Id != id)
             return Conflict($"Já existe outro usuário com o e-mail {usuarioDto.Email}.");
 
-        var usuarioEntitie = usuarioDto.Adapt<Usuario>();
-        usuarioEntitie.Id = id;
-        var usuarioAtualizado = await _usuarioService.UpdateAsync(usuarioEntitie);
+        usuarioExistente.Nome = usuarioDto.Nome;
+        usuarioExistente.Email = usuarioDto.Email;
+        usuarioExistente.Senha = usuarioDto.Senha;
+
+        var usuarioAtualizado = await _usuarioService.UpdateAsync(usuarioExistente);
         var usuarioResponse = usuarioAtualizado.Adapt<UsuarioDTOResponse>();
         return Ok(usuarioResponse);
     }

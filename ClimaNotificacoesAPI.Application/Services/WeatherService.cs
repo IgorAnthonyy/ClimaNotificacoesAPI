@@ -17,7 +17,7 @@ public class WeatherService
     }
 
     // Método assíncrono para obter a previsão do tempo de uma cidade
-    public async Task<JObject> ObterPrevisao(string cidade)
+    public async Task<JObject> GetForecast(string cidade)
     {
         // Monta a URL para fazer a requisição à API do OpenWeatherMap com os parâmetros necessários
         var url = $"http://api.openweathermap.org/data/2.5/weather?q={cidade}&appid={_apiKey}&units=metric&lang=pt_br";
