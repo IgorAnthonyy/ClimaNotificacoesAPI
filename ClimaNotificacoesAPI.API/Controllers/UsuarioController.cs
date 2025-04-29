@@ -96,10 +96,6 @@ public class UsuarioController : ControllerBase
             var cidadesResponse = cidades.Adapt<List<CidadePorUsuarioDTO>>();
             return Ok(cidadesResponse);
         }
-        catch (CidadeNaoEncontradaException ex)
-        {
-            return NotFound(ex.Message);
-        }
         catch (UsuarioNaoEncontradoException ex)
         {
             return NotFound(ex.Message);

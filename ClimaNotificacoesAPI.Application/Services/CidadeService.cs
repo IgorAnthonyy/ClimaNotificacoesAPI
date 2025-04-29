@@ -25,6 +25,7 @@ public class CidadeService
     }
     public async Task<Cidade> CreateAsync(Cidade cidade)
     {
+        
         var cidadesUsuario = await _usuarioService.GetCidadesByUsuarioIdAsync(cidade.UsuarioId);
         var cidadeExistente = false;
         if (cidadesUsuario != null)

@@ -20,9 +20,16 @@ public class CidadeController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetCidade(int id)
     {
-        var cidade = await _cidadeService.GetByIdAsync(id);
-        var cidadeResponse = cidade.Adapt<CidadeDTOResponse>();
-        return Ok(cidadeResponse);
+        try
+        {
+            var cidade = await _cidadeService.GetByIdAsync(id);
+            var cidadeResponse = cidade.Adapt<CidadeDTOResponse>();
+            return Ok(cidadeResponse);
+        }
+        catch (CidadeNaoEncontradaException ex)
+        {
+            return NotFound(ex.Message);
+        }
     }
     [HttpPost]
     public async Task<IActionResult> CreateCidade([FromBody] CidadeDTORequest cidadeDto)
@@ -39,12 +46,23 @@ public class CidadeController : ControllerBase
         {
             return Conflict(ex.Message);
         }
+        catch (UsuarioNaoEncontradoException ex)
+        {
+            return NotFound(ex.Message);
+        }
     }
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteCidade(int id)
     {
-        await _cidadeService.DeleteAsync(id);
-        return NoContent();
+        try
+        {
+            await _cidadeService.DeleteAsync(id);
+            return NoContent();
+        }
+        catch (CidadeNaoEncontradaException ex)
+        {
+            return NotFound(ex.Message);
+        }
     }
     [HttpGet("{id}/PrevisaoTempo")]
     public async Task<IActionResult> GetPrevisaoTempo(int id)

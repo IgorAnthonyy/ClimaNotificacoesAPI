@@ -68,10 +68,6 @@ public class UsuarioService
             throw new UsuarioNaoEncontradoException();
         }
         var cidades = await _usuarioRepository.GetCidadesByUsuarioIdAsync(usuarioId);
-        if (cidades == null || !cidades.Any())
-        {
-            throw new CidadeNaoEncontradaException("Cidades");
-        }
         return cidades;
     }
 }
