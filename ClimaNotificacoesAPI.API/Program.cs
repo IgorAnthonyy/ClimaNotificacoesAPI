@@ -5,8 +5,11 @@ using ClimaNotificacoesAPI.Domain.Interfaces;  // Importando interfaces dos repo
 using ClimaNotificacoesAPI.Infrastructure.Data;  // Importando contexto do banco de dados
 using ClimaNotificacoesAPI.Infrastructure.Repositories;  // Importando implementações de repositórios
 using Mapster;  // Importando Mapster, usado para mapeamento de objetos
-
-using Microsoft.EntityFrameworkCore;  // Importando bibliotecas para trabalhar com Entity Framework
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.EntityFrameworkCore;
+using ClimaNotificacoesAPI.Infrastructure.Auth;  // Importando bibliotecas para trabalhar com Entity Framework
 
 var builder = WebApplication.CreateBuilder(args);  // Criando o builder da aplicação Web
 
@@ -37,6 +40,38 @@ PrevisaoProfile.ConfigureMappings();  // Configura mapeamento de Previsao
 builder.Services.AddDbContext<ClimaNotificacoesDBContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));  // Configura a conexão com o banco de dados SQL Server usando a string de conexão definida no appsettings.json
 
+// Configurando JWT a partir do .env
+var jwtSettings = new JwtSettings
+{
+    Key = "sua-chave-super-secreta-123456789",
+    Issuer = "clima.com",
+    Audience = "clima.com",
+    ExpireMinutes = 60
+};
+
+builder.Services.AddSingleton(jwtSettings);
+
+// Configurando autenticação JWT
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    var key = Encoding.ASCII.GetBytes(jwtSettings.Key);
+
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidIssuer = jwtSettings.Issuer,
+        ValidateAudience = true,
+        ValidAudience = jwtSettings.Audience,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ClockSkew = TimeSpan.Zero
+    };
+});
 var app = builder.Build();  // Construi a aplicação web a partir das configurações definidas
 
 if (app.Environment.IsDevelopment())  // Verifica se o ambiente de execução é "Desenvolvimento"

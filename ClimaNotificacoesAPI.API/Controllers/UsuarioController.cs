@@ -11,9 +11,11 @@ namespace ClimaNotificacoesAPI.API.Controllers;
 public class UsuarioController : ControllerBase
 {
     private readonly UsuarioService _usuarioService;
+    private readonly TokenService _tokenService;
 
-    public UsuarioController(UsuarioService usuarioService)
+    public UsuarioController(UsuarioService usuarioService, TokenService tokenService)
     {
+        _tokenService = tokenService;
         _usuarioService = usuarioService;
     }
 
@@ -99,6 +101,30 @@ public class UsuarioController : ControllerBase
         catch (UsuarioNaoEncontradoException ex)
         {
             return NotFound(ex.Message);
+        }
+    }
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginDTORequest usuarioLoginDto)
+    {
+        try
+        {
+            var usuario = await _usuarioService.LoginAsync(usuarioLoginDto);
+            var token = _tokenService.GerarToken(usuario); 
+            var usuarioResponse = usuario.Adapt<UsuarioDTOResponse>();
+            var loginResponse = new LoginDTOResponse
+            {
+                Usuario = usuarioResponse,
+                Token = token
+            };
+            return Ok(loginResponse);
+        }
+        catch (UsuarioNaoEncontradoException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (CredencialIncorretaException ex)
+        {
+            return Unauthorized(ex.Message);
         }
     }
 }

@@ -1,7 +1,9 @@
+using ClimaNotificacoesAPI.Application.Dtos;
 using ClimaNotificacoesAPI.Application.Exceptions;
 using ClimaNotificacoesAPI.Domain.Entities;
 using ClimaNotificacoesAPI.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.Data;
 
 namespace ClimaNotificacoesAPI.Application.Services;
 
@@ -69,5 +71,18 @@ public class UsuarioService
         }
         var cidades = await _usuarioRepository.GetCidadesByUsuarioIdAsync(usuarioId);
         return cidades;
+    }
+    public async Task<Usuario> LoginAsync(LoginDTORequest login){
+        var usuario = await _usuarioRepository.GetByEmailAsync(login.Email);
+        if (usuario == null)
+        {
+            throw new UsuarioNaoEncontradoException();
+        }
+        var resultado = _passwordHasher.VerifyHashedPassword(usuario, usuario.Senha, login.Senha);
+        if (resultado == PasswordVerificationResult.Failed)
+        {
+            throw new CredencialIncorretaException();
+        }
+        return usuario;
     }
 }

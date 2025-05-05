@@ -2,7 +2,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ClimaNotificacoesAPI.Domain\ClimaNotificacoesAPI.Domain.csproj" />
-    <ProjectReference Include="..\ClimaNotificacoesAPI.Application\ClimaNotificacoesAPI.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>
