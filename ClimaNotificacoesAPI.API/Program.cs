@@ -31,6 +31,7 @@ builder.Services.AddHttpClient<WeatherService>();  // Registrando o serviço par
 builder.Services.AddScoped<WeatherService>();  // Registrando a implementação do serviço WeatherService
 builder.Services.AddHostedService<PrevisaoTempoJob>();  // Registrando o serviço em segundo plano para atualização das previsões de tempo
 builder.Services.AddScoped<EmailService>();  // Registrando o serviço de envio de e-mails
+builder.Services.AddScoped<TokenService>();  // Registrando o serviço de geração de tokens JWT
 // Configurando os mapeamentos de objetos para as entidades (Mapster)
 UsuarioProfile.ConfigureMappings();  // Configura mapeamento de Usuario
 CidadeProfile.ConfigureMappings();  // Configura mapeamento de Cidade
