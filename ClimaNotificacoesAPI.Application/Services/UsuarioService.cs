@@ -17,7 +17,12 @@ public class UsuarioService
     }
     public async Task<Usuario> GetByIdAsync(int id)
     {
-        return await _usuarioRepository.GetByIdAsync(id);
+        var usuario = await _usuarioRepository.GetByIdAsync(id);
+        if (usuario == null)
+        {
+            throw new UsuarioNaoEncontradoException();
+        }
+        return usuario;
     }
     public async Task<IEnumerable<Usuario>> GetAllAsync()
     {

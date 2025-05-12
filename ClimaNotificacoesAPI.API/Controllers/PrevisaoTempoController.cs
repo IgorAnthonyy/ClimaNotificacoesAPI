@@ -19,17 +19,8 @@ public class PrevisaoTempoController : ControllerBase
     [HttpPost("{id}")]
     public async Task<ActionResult> ObterPrevisao(int id)
     {
-
-        try
-        {
-            var previsaoResponse = await _previsaoTempoService.FetchAndUpdateForecastAsync(id);
-            return Ok(previsaoResponse);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
-
+        var previsaoResponse = await _previsaoTempoService.FetchAndUpdateForecastAsync(id);
+        return Ok(previsaoResponse);
     }
 
 }

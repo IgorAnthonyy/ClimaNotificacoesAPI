@@ -9,7 +9,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
-using ClimaNotificacoesAPI.Infrastructure.Auth;  // Importando bibliotecas para trabalhar com Entity Framework
+using ClimaNotificacoesAPI.Infrastructure.Auth;
+using ClimaNotificacoesAPI.API.Middlewares;  // Importando bibliotecas para trabalhar com Entity Framework
 
 var builder = WebApplication.CreateBuilder(args);  // Criando o builder da aplicação Web
 
@@ -74,7 +75,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 var app = builder.Build();  // Construi a aplicação web a partir das configurações definidas
-
+app.UseMiddleware<ExceptionMiddleware>();
 if (app.Environment.IsDevelopment())  // Verifica se o ambiente de execução é "Desenvolvimento"
 {
     app.UseSwagger();  // Ativa o Swagger para documentação da API

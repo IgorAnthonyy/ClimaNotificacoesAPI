@@ -20,63 +20,31 @@ public class CidadeController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetCidade(int id)
     {
-        try
-        {
-            var cidade = await _cidadeService.GetByIdAsync(id);
-            var cidadeResponse = cidade.Adapt<CidadeDTOResponse>();
-            return Ok(cidadeResponse);
-        }
-        catch (CidadeNaoEncontradaException ex)
-        {
-            return NotFound(ex.Message);
-        }
+        var cidade = await _cidadeService.GetByIdAsync(id);
+        var cidadeResponse = cidade.Adapt<CidadeDTOResponse>();
+        return Ok(cidadeResponse);
     }
     [HttpPost]
     public async Task<IActionResult> CreateCidade([FromBody] CidadeDTORequest cidadeDto)
     {
-        try
-        {
-            var cidadeEntitie = cidadeDto.Adapt<Cidade>();
-            var cidadeCriada = await _cidadeService.CreateAsync(cidadeEntitie);
-            var cidadeBuscar = await _cidadeService.GetByIdAsync(cidadeCriada.Id);
-            var cidadeResponse = cidadeBuscar.Adapt<CidadeDTOResponse>();
-            return CreatedAtAction(nameof(GetCidade), new { id = cidadeResponse.Id }, cidadeResponse);
-        }
-        catch (CidadeJaCadastradaParaEsseUsuarioException ex)
-        {
-            return Conflict(ex.Message);
-        }
-        catch (UsuarioNaoEncontradoException ex)
-        {
-            return NotFound(ex.Message);
-        }
+        var cidadeEntitie = cidadeDto.Adapt<Cidade>();
+        var cidadeCriada = await _cidadeService.CreateAsync(cidadeEntitie);
+        var cidadeBuscar = await _cidadeService.GetByIdAsync(cidadeCriada.Id);
+        var cidadeResponse = cidadeBuscar.Adapt<CidadeDTOResponse>();
+        return CreatedAtAction(nameof(GetCidade), new { id = cidadeResponse.Id }, cidadeResponse);
     }
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteCidade(int id)
     {
-        try
-        {
-            await _cidadeService.DeleteAsync(id);
-            return NoContent();
-        }
-        catch (CidadeNaoEncontradaException ex)
-        {
-            return NotFound(ex.Message);
-        }
+        await _cidadeService.DeleteAsync(id);
+        return NoContent();
     }
     [HttpGet("{id}/PrevisaoTempo")]
     public async Task<IActionResult> GetPrevisaoTempo(int id)
     {
-        try
-        {
-            var previsaoTempo = await _cidadeService.GetPrevisaoTempoByCidadeAsync(id);
-            var previsaoTempoResponse = previsaoTempo.Adapt<List<PrevisaoDTOResponse>>();
-            return Ok(previsaoTempoResponse);
-        }
-        catch (CidadeNaoEncontradaException ex)
-        {
-            return NotFound(ex.Message);
-        }
+        var previsaoTempo = await _cidadeService.GetPrevisaoTempoByCidadeAsync(id);
+        var previsaoTempoResponse = previsaoTempo.Adapt<List<PrevisaoDTOResponse>>();
+        return Ok(previsaoTempoResponse);
     }
     [HttpGet]
     public async Task<IActionResult> GetCidades()
