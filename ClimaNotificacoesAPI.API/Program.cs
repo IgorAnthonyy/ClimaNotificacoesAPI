@@ -28,8 +28,8 @@ builder.Services.AddScoped<ICidadeRepository, CidadeRepository>();  // Registran
 builder.Services.AddScoped<CidadeService>();  // Registrando o serviço de cidades
 builder.Services.AddScoped<IPrevisaoTempoRepository, PrevisaoTempoRepository>();  // Registrando o repositório de previsões de tempo
 builder.Services.AddScoped<PrevisaoTempoService>();  // Registrando o serviço de previsões de tempo
-builder.Services.AddHttpClient<WeatherService>();  // Registrando o serviço para consultar o clima
-builder.Services.AddScoped<WeatherService>();  // Registrando a implementação do serviço WeatherService
+builder.Services.AddHttpClient<IWeatherService, WeatherService>();  // Registrando o serviço para consultar o clima
+builder.Services.AddScoped<IWeatherService, WeatherService>();  // Registrando a implementação do serviço WeatherService
 builder.Services.AddHostedService<PrevisaoTempoJob>();  // Registrando o serviço em segundo plano para atualização das previsões de tempo
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));  // Configurando EmailSettings
 builder.Services.AddScoped<EmailService>();  // Registrando o serviço de envio de e-mails

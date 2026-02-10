@@ -12,10 +12,10 @@ public class PrevisaoTempoService
     private readonly IPrevisaoTempoRepository _previsaoTempoRepository;
     private readonly CidadeService _cidadeService;
     private readonly EmailService _emailService;
-    private readonly WeatherService _weatherService;
+    private readonly IWeatherService _weatherService;
     private readonly UsuarioService _usuarioService;
 
-    public PrevisaoTempoService(IPrevisaoTempoRepository previsaoTempoRepository, CidadeService cidadeService, UsuarioService usuarioService, EmailService emailService, WeatherService weatherService)
+    public PrevisaoTempoService(IPrevisaoTempoRepository previsaoTempoRepository, CidadeService cidadeService, UsuarioService usuarioService, EmailService emailService, IWeatherService weatherService)
     {
         _weatherService = weatherService;
         _cidadeService = cidadeService;
