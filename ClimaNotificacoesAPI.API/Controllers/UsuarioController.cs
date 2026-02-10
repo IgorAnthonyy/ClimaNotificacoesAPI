@@ -70,7 +70,7 @@ public class UsuarioController : ControllerBase
     public async Task<IActionResult> Login([FromBody] LoginDTORequest usuarioLoginDto)
     {
         var usuario = await _usuarioService.LoginAsync(usuarioLoginDto);
-        var token = _tokenService.GerarToken(usuario);
+        var token = _tokenService.GenerateToken(usuario);
         var usuarioResponse = usuario.Adapt<UsuarioDTOResponse>();
         var loginResponse = new LoginDTOResponse
         {

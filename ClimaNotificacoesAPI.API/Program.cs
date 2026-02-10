@@ -31,6 +31,7 @@ builder.Services.AddScoped<PrevisaoTempoService>();  // Registrando o serviço d
 builder.Services.AddHttpClient<WeatherService>();  // Registrando o serviço para consultar o clima
 builder.Services.AddScoped<WeatherService>();  // Registrando a implementação do serviço WeatherService
 builder.Services.AddHostedService<PrevisaoTempoJob>();  // Registrando o serviço em segundo plano para atualização das previsões de tempo
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));  // Configurando EmailSettings
 builder.Services.AddScoped<EmailService>();  // Registrando o serviço de envio de e-mails
 builder.Services.AddScoped<TokenService>();  // Registrando o serviço de geração de tokens JWT
 // Configurando os mapeamentos de objetos para as entidades (Mapster)
@@ -42,16 +43,9 @@ PrevisaoProfile.ConfigureMappings();  // Configura mapeamento de Previsao
 builder.Services.AddDbContext<ClimaNotificacoesDBContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));  // Configura a conexão com o banco de dados SQL Server usando a string de conexão definida no appsettings.json
 
-// Configurando JWT a partir do .env
-var jwtSettings = new JwtSettings
-{
-    Key = "sua-chave-super-secreta-123456789",
-    Issuer = "clima.com",
-    Audience = "clima.com",
-    ExpireMinutes = 60
-};
-
-builder.Services.AddSingleton(jwtSettings);
+// Configurando JWT a partir da configuração
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
 
 // Configurando autenticação JWT
 builder.Services.AddAuthentication(options =>
@@ -97,7 +91,7 @@ using (var scope = app.Services.CreateScope())  // Cria um escopo para obter o c
     catch (Exception ex)  // Em caso de qualquer outro erro
     {
         Console.WriteLine($"Erro ao aplicar migrations: {ex.Message}");  // Exibe a mensagem de erro
-        throw;  // Lança a exceção para ser tratada em um nível superior
+        throw;  // Lança a exceção para ser tratada em um nível superior, preservando o stack trace
     }
 }
 

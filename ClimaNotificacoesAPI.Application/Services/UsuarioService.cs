@@ -41,10 +41,7 @@ public class UsuarioService
     public async Task<Usuario> UpdateAsync(Usuario usuario)
     {
         var usuarioExistente = await GetByIdAsync(usuario.Id);
-        if (usuarioExistente == null)
-        {
-            throw new UsuarioNaoEncontradoException();
-        }
+        
         var usuarioComMesmoEmail = await GetByEmailAsync(usuario.Email);
         if (usuarioComMesmoEmail != null && usuarioComMesmoEmail.Id != usuario.Id)
             throw new EmailJaCadastradoException(usuario.Email);
@@ -57,10 +54,6 @@ public class UsuarioService
     public async Task DeleteAsync(int id)
     {
         var usuarioExistente = await GetByIdAsync(id);
-        if (usuarioExistente == null)
-        {
-            throw new UsuarioNaoEncontradoException();
-        }
         await _usuarioRepository.DeleteAsync(id);
     }
     public async Task<Usuario> GetByEmailAsync(string email)
@@ -70,10 +63,6 @@ public class UsuarioService
     public async Task<IEnumerable<Cidade>> GetCidadesByUsuarioIdAsync(int usuarioId)
     {
         var usuario = await GetByIdAsync(usuarioId);
-        if (usuario == null)
-        {
-            throw new UsuarioNaoEncontradoException();
-        }
         var cidades = await _usuarioRepository.GetCidadesByUsuarioIdAsync(usuarioId);
         return cidades;
     }
