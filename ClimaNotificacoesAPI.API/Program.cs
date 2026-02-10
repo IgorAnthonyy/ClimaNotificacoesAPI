@@ -16,6 +16,19 @@ var builder = WebApplication.CreateBuilder(args);  // Criando o builder da aplic
 
 DotNetEnv.Env.Load();
 builder.Configuration.AddEnvironmentVariables();  // Carregando variáveis de ambiente para configuração
+
+// Configurando CORS para permitir requisições do frontend
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngular", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200")
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
+    });
+});
+
 // Adicionando os serviços necessários para o controlador de APIs
 builder.Services.AddControllers();  // Adiciona suporte a controllers (APIs) no pipeline
 builder.Services.AddEndpointsApiExplorer();  // Habilita a descoberta de endpoints na documentação
@@ -95,7 +108,10 @@ using (var scope = app.Services.CreateScope())  // Cria um escopo para obter o c
     }
 }
 
+app.UseCors("AllowAngular");  // Habilita CORS para permitir requisições do frontend
 app.UseHttpsRedirection();  // Força redirecionamento de HTTP para HTTPS
+app.UseAuthentication();  // Habilita autenticação
+app.UseAuthorization();  // Habilita autorização
 app.MapControllers();  // Mapear os endpoints dos controladores (APIs)
 app.Urls.Add("http://0.0.0.0:80");  // Configura a URL para a aplicação escutar (adicionando uma URL alternativa para a API)
 app.Run();  // Inicia a aplicação e começa a escutar requisições HTTP

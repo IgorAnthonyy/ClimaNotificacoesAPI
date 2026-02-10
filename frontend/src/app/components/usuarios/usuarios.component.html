@@ -1,0 +1,107 @@
+<div class="container main-container">
+  <div class="row">
+    <div class="col-12">
+      <h2><i class="bi bi-people"></i> Gerenciamento de Usuários</h2>
+      <hr>
+
+      <!-- Botão Novo Usuário -->
+      <div class="mb-3">
+        <button class="btn btn-primary" (click)="openCreateForm()" *ngIf="!showForm">
+          <i class="bi bi-plus-circle"></i> Novo Usuário
+        </button>
+      </div>
+
+      <!-- Formulário -->
+      <div class="card mb-3" *ngIf="showForm">
+        <div class="card-header">
+          <h5>{{ editMode ? 'Editar Usuário' : 'Novo Usuário' }}</h5>
+        </div>
+        <div class="card-body">
+          <form #usuarioForm="ngForm" (ngSubmit)="saveUsuario()">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Nome *</label>
+                <input type="text" class="form-control" [(ngModel)]="selectedUsuario.nome" 
+                       name="nome" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">E-mail *</label>
+                <input type="email" class="form-control" [(ngModel)]="selectedUsuario.email" 
+                       name="email" required>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Senha *</label>
+                <input type="password" class="form-control" [(ngModel)]="selectedUsuario.senha" 
+                       name="senha" [required]="!editMode">
+                <small class="text-muted" *ngIf="editMode">Deixe em branco para manter a senha atual</small>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Telefone *</label>
+                <input type="text" class="form-control" [(ngModel)]="selectedUsuario.telefone" 
+                       name="telefone" required>
+              </div>
+            </div>
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-success" [disabled]="!usuarioForm.valid">
+                <i class="bi bi-check-circle"></i> Salvar
+              </button>
+              <button type="button" class="btn btn-secondary" (click)="cancelForm()">
+                <i class="bi bi-x-circle"></i> Cancelar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Lista de Usuários -->
+      <div class="card">
+        <div class="card-header">
+          <h5>Lista de Usuários</h5>
+        </div>
+        <div class="card-body">
+          <div *ngIf="loading" class="text-center">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Carregando...</span>
+            </div>
+          </div>
+
+          <div *ngIf="!loading && usuarios.length === 0" class="alert alert-info">
+            Nenhum usuário cadastrado. Clique em "Novo Usuário" para começar.
+          </div>
+
+          <div *ngIf="!loading && usuarios.length > 0" class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nome</th>
+                  <th>E-mail</th>
+                  <th>Telefone</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let usuario of usuarios">
+                  <td>{{ usuario.id }}</td>
+                  <td>{{ usuario.nome }}</td>
+                  <td>{{ usuario.email }}</td>
+                  <td>{{ usuario.telefone }}</td>
+                  <td>
+                    <button class="btn btn-sm btn-warning btn-action" (click)="openEditForm(usuario)">
+                      <i class="bi bi-pencil"></i> Editar
+                    </button>
+                    <button class="btn btn-sm btn-danger" (click)="deleteUsuario(usuario.id!)">
+                      <i class="bi bi-trash"></i> Excluir
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
