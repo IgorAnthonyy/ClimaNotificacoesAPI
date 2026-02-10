@@ -44,8 +44,8 @@ public class CidadeService
         var cidade = await GetByIdAsync(cidadeId);
         return await _cidadeRepository.GetPrevisaoTempoByCidadeAsync(cidadeId);
     }
-    public async Task<List<Cidade>> GetAllAsync()
+    public async Task<IEnumerable<Cidade>> GetAllAsync()
     {
-        return (await _cidadeRepository.GetAllAsync()).ToList();
+        return await _cidadeRepository.GetAllAsync();
     }
 }

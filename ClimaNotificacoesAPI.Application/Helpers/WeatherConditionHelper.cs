@@ -1,5 +1,3 @@
-using ClimaNotificacoesAPI.Domain.Entities;
-
 namespace ClimaNotificacoesAPI.Application.Helpers;
 
 public static class WeatherConditionHelper
