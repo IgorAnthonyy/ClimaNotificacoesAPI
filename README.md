@@ -163,6 +163,38 @@ dotnet run --project ClimaNotificacoesAPI.API
 - ✅ Validação de DTOs com Data Annotations
 - ✅ Melhor uso de injeção de dependência
 
+## 🧪 Testes Unitários
+
+O projeto possui **38 testes unitários** com 100% de taxa de sucesso cobrindo:
+
+- ✅ **Services**: UsuarioService, CidadeService, TokenService (20 testes)
+- ✅ **Helpers**: WeatherConditionHelper (7 testes)
+- ✅ **Repositories**: GenericRepository (7 testes)
+- ✅ **Controllers**: Validação de endpoints (4 testes)
+
+### Executar Testes
+
+```bash
+# Executar todos os testes
+dotnet test
+
+# Executar com detalhes
+dotnet test --logger "console;verbosity=detailed"
+
+# Executar testes específicos
+dotnet test --filter "FullyQualifiedName~Services"
+```
+
+Para mais detalhes sobre os testes, consulte [TESTING.md](TESTING.md).
+
+### Tecnologias de Teste
+
+- xUnit - Framework de teste
+- Moq - Mocking
+- FluentAssertions - Assertions
+- AutoFixture - Geração de dados
+- EF Core InMemory - Banco de dados em memória
+
 ## 📝 Licença
 
 Este projeto está sob licença MIT.
