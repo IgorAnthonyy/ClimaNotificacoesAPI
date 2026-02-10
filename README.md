@@ -70,6 +70,7 @@ O projeto segue Clean Architecture com separação em camadas:
    ```
 
    A aplicação estará disponível em:
+   - **Frontend (Angular)**: http://localhost:4200
    - **API**: http://localhost:8080
    - **Swagger**: http://localhost:8080/swagger
 
@@ -83,6 +84,25 @@ O projeto segue Clean Architecture com separação em camadas:
    docker-compose down -v
    docker-compose up --build
    ```
+
+## 🖥️ Executar Frontend Localmente (Desenvolvimento)
+
+Para desenvolvimento do frontend sem Docker:
+
+```bash
+# Entre no diretório do frontend
+cd frontend
+
+# Instale as dependências
+npm install
+
+# Execute o servidor de desenvolvimento
+ng serve
+
+# Frontend estará em http://localhost:4200
+```
+
+**Nota**: Certifique-se de que a API está rodando em http://localhost:8080
 
 ## ⚙️ Configuração Manual (Sem Docker)
 

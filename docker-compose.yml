@@ -50,6 +50,19 @@ services:
       - clima-net
     restart: unless-stopped
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: clima-frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - clima-api
+    networks:
+      - clima-net
+    restart: unless-stopped
+
 networks:
   clima-net:
     driver: bridge
