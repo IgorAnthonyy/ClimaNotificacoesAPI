@@ -1,4 +1,35 @@
+# Build artifacts
 bin/
 obj/
 [Bb]uild/
 [Ll]og/
+[Ll]ogs/
+out/
+
+# IDE and editor files
+.vs/
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Documentation and misc
+README.md
+*.md
+.env
+.env.*
+
+# OS files
+.DS_Store
+Thumbs.db

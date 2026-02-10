@@ -24,9 +24,67 @@ O projeto segue Clean Architecture com separação em camadas:
 - Mapster (Object Mapping)
 - MailKit (Email)
 - OpenWeatherMap API
-- Docker
+- Docker & Docker Compose
 
-## ⚙️ Configuração
+## 🐳 Como Executar com Docker (Recomendado)
+
+### Pré-requisitos
+
+- Docker
+- Docker Compose
+
+### Passos
+
+1. **Clone o repositório**
+   ```bash
+   git clone https://github.com/IgorAnthonyy/ClimaNotificacoesAPI.git
+   cd ClimaNotificacoesAPI
+   ```
+
+2. **Configure as variáveis de ambiente**
+   
+   Copie o arquivo `.env.example` para `.env`:
+   ```bash
+   cp .env.example .env
+   ```
+
+   Edite o arquivo `.env` e configure as seguintes variáveis:
+   ```bash
+   # Senha forte para o SQL Server (obrigatório)
+   PASSWORD_SQL=YourStr0ng!Password#2024
+
+   # Credenciais de email para envio de alertas (opcional, mas recomendado)
+   EMAIL_USERNAME=seu@email.com
+   EMAIL_PASSWORD=suaSenhaDeEmail
+
+   # Chave JWT (use uma chave forte em produção)
+   JWT_SECRET_KEY=sua-chave-super-secreta-minima-32-caracteres
+
+   # API Key do OpenWeatherMap (obtenha em https://openweathermap.org/api)
+   OPENWEATHER_API_KEY=sua-api-key-aqui
+   ```
+
+3. **Execute o projeto**
+   ```bash
+   docker-compose up
+   ```
+
+   A aplicação estará disponível em:
+   - **API**: http://localhost:8080
+   - **Swagger**: http://localhost:8080/swagger
+
+4. **Para parar a aplicação**
+   ```bash
+   docker-compose down
+   ```
+
+5. **Para limpar volumes e recomeçar**
+   ```bash
+   docker-compose down -v
+   docker-compose up --build
+   ```
+
+## ⚙️ Configuração Manual (Sem Docker)
 
 ### Variáveis de Ambiente
 
@@ -55,15 +113,7 @@ Configure as seguintes variáveis no arquivo `appsettings.json`:
 }
 ```
 
-### Como Executar
-
-#### Com Docker
-
-```bash
-docker-compose up
-```
-
-#### Localmente
+### Como Executar Localmente (sem Docker)
 
 ```bash
 dotnet restore
