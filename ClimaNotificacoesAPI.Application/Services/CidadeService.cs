@@ -46,6 +46,7 @@ public class CidadeService
     }
     public async Task<List<Cidade>> GetAllAsync()
     {
-        return await _cidadeRepository.GetAllAsync();
+        var cidades = await _cidadeRepository.GetAllAsync();
+        return cidades.ToList();
     }
 }
