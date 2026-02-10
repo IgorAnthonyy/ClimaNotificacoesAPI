@@ -7,10 +7,20 @@ services:
     environment:
       - ACCEPT_EULA=Y
       - SA_PASSWORD=${PASSWORD_SQL}
+      - MSSQL_PID=Developer
     ports:
       - "1433:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
     networks:
       - clima-net
+    healthcheck:
+      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "${PASSWORD_SQL}" -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
 
   clima-api:
     build:
@@ -20,15 +30,42 @@ services:
     ports:
       - "8080:80"
     depends_on:
-      - sqlserver
+      sqlserver:
+        condition: service_healthy
     environment:
       - EMAIL_USERNAME=${EMAIL_USERNAME}
       - EMAIL_PASSWORD=${EMAIL_PASSWORD}
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=ClimaNotificacoesDB;User=sa;Password=${PASSWORD_SQL};TrustServerCertificate=True
+      - JwtSettings__Key=${JWT_SECRET_KEY}
+      - JwtSettings__Issuer=clima.com
+      - JwtSettings__Audience=clima.com
+      - JwtSettings__ExpireMinutes=60
+      - EmailSettings__Username=${EMAIL_USERNAME}
+      - EmailSettings__Password=${EMAIL_PASSWORD}
+      - EmailSettings__SmtpServer=smtp-mail.outlook.com
+      - EmailSettings__SmtpPort=587
+      - OpenWeatherMap__ApiKey=${OPENWEATHER_API_KEY}
     networks:
       - clima-net
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: clima-frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - clima-api
+    networks:
+      - clima-net
+    restart: unless-stopped
 
 networks:
   clima-net:
     driver: bridge
+
+volumes:
+  sqlserver-data:

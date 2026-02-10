@@ -1,18 +1,24 @@
 using MailKit.Net.Smtp;
 using MimeKit;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
+using ClimaNotificacoesAPI.Infrastructure.Auth;
 
 namespace ClimaNotificacoesAPI.Application.Services
 {
     public class EmailService
     {
+        private readonly EmailSettings _emailSettings;
+
+        public EmailService(IOptions<EmailSettings> emailSettings)
+        {
+            _emailSettings = emailSettings.Value;
+        }
+
         public async Task SendAlertEmailAsync(string destinatario, string nomeUsuario, string alerta, string cidade)
         {
-            var emailEnv = Environment.GetEnvironmentVariable("EMAIL_USERNAME");
-            var senhaEnv = Environment.GetEnvironmentVariable("EMAIL_PASSWORD");
-
             var email = new MimeMessage();
-            email.From.Add(new MailboxAddress("Alerta de Clima", emailEnv));
+            email.From.Add(new MailboxAddress("Alerta de Clima", _emailSettings.Username));
             email.To.Add(new MailboxAddress("", destinatario));
             email.Subject = "🚨 Alerta de Clima Ativado";
 
@@ -33,8 +39,8 @@ namespace ClimaNotificacoesAPI.Application.Services
             };
 
             using var smtp = new SmtpClient();
-            await smtp.ConnectAsync("smtp-mail.outlook.com", 587, MailKit.Security.SecureSocketOptions.StartTls);
-            await smtp.AuthenticateAsync(emailEnv, senhaEnv);
+            await smtp.ConnectAsync(_emailSettings.SmtpServer, _emailSettings.SmtpPort, MailKit.Security.SecureSocketOptions.StartTls);
+            await smtp.AuthenticateAsync(_emailSettings.Username, _emailSettings.Password);
             await smtp.SendAsync(email);
             await smtp.DisconnectAsync(true);
         }

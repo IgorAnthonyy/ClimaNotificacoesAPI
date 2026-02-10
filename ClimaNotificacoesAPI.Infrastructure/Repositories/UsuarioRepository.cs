@@ -5,47 +5,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ClimaNotificacoesAPI.Infrastructure.Repositories;
 
-public class UsuarioRepository : IUsuarioRepository
+public class UsuarioRepository : GenericRepository<Usuario>, IUsuarioRepository
 {
+    public UsuarioRepository(ClimaNotificacoesDBContext context) : base(context)
+    {
+    }
 
-    private readonly ClimaNotificacoesDBContext _context;
-    public UsuarioRepository(ClimaNotificacoesDBContext context)
-    {
-        _context = context;
-    }
-    public async Task<IEnumerable<Usuario>> GetAllAsync()
-    {
-        return await _context.Usuarios.ToListAsync();
-    }
-    public async Task<Usuario> GetByIdAsync(int id)
-    {
-        return await _context.Usuarios.FindAsync(id);
-    }
-    public async Task<Usuario> AddAsync(Usuario usuario)
-    {
-        await _context.Usuarios.AddAsync(usuario);
-        await _context.SaveChangesAsync();
-        return usuario;
-    }
-    public async Task<Usuario> UpdateAsync(Usuario usuario)
-    {
-        _context.Usuarios.Update(usuario);
-        await _context.SaveChangesAsync();
-        return usuario;
-    }
-    public async Task DeleteAsync(int id)
-    {
-        var usuario = await GetByIdAsync(id);
-        if (usuario != null)
-        {
-            _context.Usuarios.Remove(usuario);
-            await _context.SaveChangesAsync();
-        }
-    }
     public async Task<Usuario> GetByEmailAsync(string email)
     {
         return await _context.Usuarios.FirstOrDefaultAsync(u => u.Email == email);
     }
+
     public async Task<IEnumerable<Cidade>> GetCidadesByUsuarioIdAsync(int usuarioId)
     {
         return await _context.Cidades.Where(c => c.UsuarioId == usuarioId)

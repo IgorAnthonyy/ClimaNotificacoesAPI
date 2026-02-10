@@ -25,44 +25,26 @@ public class CidadeService
     }
     public async Task<Cidade> CreateAsync(Cidade cidade)
     {
-        
         var cidadesUsuario = await _usuarioService.GetCidadesByUsuarioIdAsync(cidade.UsuarioId);
-        var cidadeExistente = false;
-        if (cidadesUsuario != null)
+        
+        if (cidadesUsuario != null && cidadesUsuario.Any(c => c.Nome == cidade.Nome))
         {
-            foreach (var cidadeIndividual in cidadesUsuario)
-            {
-                if (cidadeIndividual.Nome == cidade.Nome)
-                {
-                    cidadeExistente = true;
-                    break;
-                }
-            }
-        }
-        if (cidadeExistente)
             throw new CidadeJaCadastradaParaEsseUsuarioException(cidade.Nome);
+        }
+        
         return await _cidadeRepository.AddAsync(cidade);
     }
     public async Task DeleteAsync(int id)
     {
         var cidade = await GetByIdAsync(id);
-
-        if (cidade == null)
-        {
-            throw new CidadeNaoEncontradaException("Cidade");
-        }
         await _cidadeRepository.DeleteAsync(id);
     }
     public async Task<List<PrevisaoTempo>> GetPrevisaoTempoByCidadeAsync(int cidadeId)
     {
         var cidade = await GetByIdAsync(cidadeId);
-        if (cidade == null)
-        {
-            throw new CidadeNaoEncontradaException("Cidade");
-        }
         return await _cidadeRepository.GetPrevisaoTempoByCidadeAsync(cidadeId);
     }
-    public async Task<List<Cidade>> GetAllAsync()
+    public async Task<IEnumerable<Cidade>> GetAllAsync()
     {
         return await _cidadeRepository.GetAllAsync();
     }

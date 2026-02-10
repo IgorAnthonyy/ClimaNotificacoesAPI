@@ -3,3 +3,8 @@ obj/
 [Bb]uild/
 [Ll]og/
 .vscode/
+# Angular
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/.sass-cache/

@@ -16,6 +16,19 @@ var builder = WebApplication.CreateBuilder(args);  // Criando o builder da aplic
 
 DotNetEnv.Env.Load();
 builder.Configuration.AddEnvironmentVariables();  // Carregando variáveis de ambiente para configuração
+
+// Configurando CORS para permitir requisições do frontend
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngular", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200")
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
+    });
+});
+
 // Adicionando os serviços necessários para o controlador de APIs
 builder.Services.AddControllers();  // Adiciona suporte a controllers (APIs) no pipeline
 builder.Services.AddEndpointsApiExplorer();  // Habilita a descoberta de endpoints na documentação
@@ -28,9 +41,10 @@ builder.Services.AddScoped<ICidadeRepository, CidadeRepository>();  // Registran
 builder.Services.AddScoped<CidadeService>();  // Registrando o serviço de cidades
 builder.Services.AddScoped<IPrevisaoTempoRepository, PrevisaoTempoRepository>();  // Registrando o repositório de previsões de tempo
 builder.Services.AddScoped<PrevisaoTempoService>();  // Registrando o serviço de previsões de tempo
-builder.Services.AddHttpClient<WeatherService>();  // Registrando o serviço para consultar o clima
-builder.Services.AddScoped<WeatherService>();  // Registrando a implementação do serviço WeatherService
+builder.Services.AddHttpClient<IWeatherService, WeatherService>();  // Registrando o serviço para consultar o clima
+builder.Services.AddScoped<IWeatherService, WeatherService>();  // Registrando a implementação do serviço WeatherService
 builder.Services.AddHostedService<PrevisaoTempoJob>();  // Registrando o serviço em segundo plano para atualização das previsões de tempo
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));  // Configurando EmailSettings
 builder.Services.AddScoped<EmailService>();  // Registrando o serviço de envio de e-mails
 builder.Services.AddScoped<TokenService>();  // Registrando o serviço de geração de tokens JWT
 // Configurando os mapeamentos de objetos para as entidades (Mapster)
@@ -42,16 +56,9 @@ PrevisaoProfile.ConfigureMappings();  // Configura mapeamento de Previsao
 builder.Services.AddDbContext<ClimaNotificacoesDBContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));  // Configura a conexão com o banco de dados SQL Server usando a string de conexão definida no appsettings.json
 
-// Configurando JWT a partir do .env
-var jwtSettings = new JwtSettings
-{
-    Key = "sua-chave-super-secreta-123456789",
-    Issuer = "clima.com",
-    Audience = "clima.com",
-    ExpireMinutes = 60
-};
-
-builder.Services.AddSingleton(jwtSettings);
+// Configurando JWT a partir da configuração
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
 
 // Configurando autenticação JWT
 builder.Services.AddAuthentication(options =>
@@ -97,11 +104,14 @@ using (var scope = app.Services.CreateScope())  // Cria um escopo para obter o c
     catch (Exception ex)  // Em caso de qualquer outro erro
     {
         Console.WriteLine($"Erro ao aplicar migrations: {ex.Message}");  // Exibe a mensagem de erro
-        throw;  // Lança a exceção para ser tratada em um nível superior
+        throw;  // Lança a exceção para ser tratada em um nível superior, preservando o stack trace
     }
 }
 
+app.UseCors("AllowAngular");  // Habilita CORS para permitir requisições do frontend
 app.UseHttpsRedirection();  // Força redirecionamento de HTTP para HTTPS
+app.UseAuthentication();  // Habilita autenticação
+app.UseAuthorization();  // Habilita autorização
 app.MapControllers();  // Mapear os endpoints dos controladores (APIs)
 app.Urls.Add("http://0.0.0.0:80");  // Configura a URL para a aplicação escutar (adicionando uma URL alternativa para a API)
 app.Run();  // Inicia a aplicação e começa a escutar requisições HTTP

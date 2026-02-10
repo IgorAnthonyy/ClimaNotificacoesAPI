@@ -1,7 +1,7 @@
 using ClimaNotificacoesAPI.Domain.Entities;
 
 namespace ClimaNotificacoesAPI.Domain.Interfaces;
-public interface IPrevisaoTempoRepository
+
+public interface IPrevisaoTempoRepository : IGenericRepository<PrevisaoTempo>
 {
-    Task<PrevisaoTempo> AddAsync(PrevisaoTempo previsaoTempo);
 }

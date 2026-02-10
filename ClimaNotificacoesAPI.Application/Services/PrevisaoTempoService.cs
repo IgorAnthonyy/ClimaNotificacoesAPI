@@ -1,5 +1,6 @@
 using ClimaNotificacoesAPI.Application.Dtos;
 using ClimaNotificacoesAPI.Application.Exceptions;
+using ClimaNotificacoesAPI.Application.Helpers;
 using ClimaNotificacoesAPI.Domain.Entities;
 using ClimaNotificacoesAPI.Domain.Interfaces;
 using Mapster;
@@ -11,27 +12,25 @@ public class PrevisaoTempoService
     private readonly IPrevisaoTempoRepository _previsaoTempoRepository;
     private readonly CidadeService _cidadeService;
     private readonly EmailService _emailService;
-    private readonly WeatherService _weatherService;
+    private readonly IWeatherService _weatherService;
     private readonly UsuarioService _usuarioService;
 
-    public PrevisaoTempoService(IPrevisaoTempoRepository previsaoTempoRepository, CidadeService cidadeService, UsuarioService ususarioService, EmailService emailService, WeatherService weatherService)
+    public PrevisaoTempoService(IPrevisaoTempoRepository previsaoTempoRepository, CidadeService cidadeService, UsuarioService usuarioService, EmailService emailService, IWeatherService weatherService)
     {
         _weatherService = weatherService;
         _cidadeService = cidadeService;
-        _usuarioService = ususarioService;
+        _usuarioService = usuarioService;
         _emailService = emailService;
         _previsaoTempoRepository = previsaoTempoRepository;
     }
     public async Task<PrevisaoDTOResponse> FetchAndUpdateForecastAsync(int cidadeId)
     {
         var cidade = await _cidadeService.GetByIdAsync(cidadeId);
-        if (cidade == null)
-            throw new CidadeNaoEncontradaException("Cidade");
 
         var previsaoJson = await _weatherService.GetForecast(cidade.Nome);
 
         if (previsaoJson == null)
-            throw new Exception("Previsão do tempo não encontrada.");
+            throw new PrevisaoTempoNaoEncontradaException("Previsão do tempo não encontrada.");
 
         var previsaoEntity = new PrevisaoTempo
         {
@@ -45,14 +44,10 @@ public class PrevisaoTempoService
         };
         var previsaoCriada = await CreateAsync(previsaoEntity);
 
-        if (previsaoEntity.Condicao == "nublado" || previsaoEntity.Condicao == "chuva leve" || previsaoEntity.Condicao == "chuva" || previsaoEntity.Condicao == "trovoada" || previsaoEntity.Condicao == "neve")
+        if (WeatherConditionHelper.RequiresAlert(previsaoEntity.Condicao))
         {
             var usuario = await _usuarioService.GetByIdAsync(cidade.UsuarioId);
-            var cidadeFetch = await _cidadeService.GetByIdAsync(cidade.Id);
-            if (usuario != null)
-            {
-                await _emailService.SendAlertEmailAsync(usuario.Email, usuario.Nome, previsaoEntity.Condicao, cidadeFetch.Nome);
-            }
+            await _emailService.SendAlertEmailAsync(usuario.Email, usuario.Nome, previsaoEntity.Condicao, cidade.Nome);
         }
         return previsaoCriada.Adapt<PrevisaoDTOResponse>();
     }
